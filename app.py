@@ -1,8 +1,6 @@
 from flask import Flask, render_template_string, request, jsonify
 import os
-
 app = Flask(__name__)
-
 # 主页面HTML模板
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
@@ -10,7 +8,7 @@ HTML_TEMPLATE = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>会议信息</title>
+    <title>大骨班培训手册</title>
     <style>
         :root {
             --primary-red: #C41E3A;
@@ -24,13 +22,11 @@ HTML_TEMPLATE = '''
             --shadow-hover: 0 8px 32px rgba(196, 30, 58, 0.22);
             --border-light: #F5D5DB;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
             background: linear-gradient(180deg, #FFF5F5 0%, #FFFFFF 30%, #FFFFFF 100%);
@@ -39,7 +35,6 @@ HTML_TEMPLATE = '''
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
-
         /* 顶部红色装饰条 */
         .top-accent {
             position: fixed;
@@ -51,12 +46,10 @@ HTML_TEMPLATE = '''
             z-index: 1000;
             animation: shimmer 3s ease-in-out infinite;
         }
-
         @keyframes shimmer {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
-
         .page-container {
             max-width: 520px;
             margin: 0 auto;
@@ -65,14 +58,12 @@ HTML_TEMPLATE = '''
             display: flex;
             flex-direction: column;
         }
-
         /* 头部区域 */
         .header {
             text-align: center;
             padding: 40px 0 8px 0;
             position: relative;
         }
-
         .header-badge {
             display: inline-block;
             background: var(--primary-red);
@@ -85,27 +76,23 @@ HTML_TEMPLATE = '''
             margin-bottom: 16px;
             text-transform: uppercase;
         }
-
         .header-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--text-dark);
             letter-spacing: 1px;
             margin-bottom: 6px;
         }
-
         .header-title .highlight {
             color: var(--primary-red);
             position: relative;
         }
-
         .header-subtitle {
             font-size: 14px;
             color: var(--text-gray);
             letter-spacing: 2px;
             font-weight: 400;
         }
-
         /* 红色分隔装饰 */
         .divider-ornament {
             display: flex;
@@ -114,7 +101,6 @@ HTML_TEMPLATE = '''
             gap: 8px;
             margin: 10px 0;
         }
-
         .divider-ornament .line {
             width: 35px;
             height: 1.5px;
@@ -122,14 +108,12 @@ HTML_TEMPLATE = '''
             opacity: 0.5;
             border-radius: 1px;
         }
-
         .divider-ornament .dot {
             width: 7px;
             height: 7px;
             background: var(--primary-red);
             border-radius: 50%;
         }
-
         /* 卡片区域 */
         .cards-section {
             flex: 1;
@@ -138,7 +122,6 @@ HTML_TEMPLATE = '''
             gap: 20px;
             padding: 20px 0;
         }
-
         .option-card {
             position: relative;
             background: var(--white);
@@ -153,18 +136,15 @@ HTML_TEMPLATE = '''
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-
         .option-card:active {
             transform: scale(0.97);
             transition: transform 0.15s ease;
         }
-
         .option-card:hover {
             box-shadow: var(--shadow-hover);
             border-color: var(--border-light);
             transform: translateY(-2px);
         }
-
         /* 卡片左侧红色竖条 */
         .option-card::before {
             content: '';
@@ -177,13 +157,11 @@ HTML_TEMPLATE = '''
             border-radius: 0 3px 3px 0;
             transition: all 0.35s ease;
         }
-
         .option-card:hover::before {
             top: 12%;
             bottom: 12%;
             width: 5px;
         }
-
         /* 卡片右上角装饰 */
         .card-decoration {
             position: absolute;
@@ -197,17 +175,14 @@ HTML_TEMPLATE = '''
             transition: all 0.4s ease;
             pointer-events: none;
         }
-
         .option-card:hover .card-decoration {
             transform: scale(1.3);
             opacity: 0.7;
         }
-
         .card-content {
             position: relative;
             z-index: 1;
         }
-
         .card-icon-wrapper {
             display: inline-flex;
             align-items: center;
@@ -219,15 +194,12 @@ HTML_TEMPLATE = '''
             margin-bottom: 16px;
             transition: all 0.3s ease;
         }
-
         .option-card:hover .card-icon-wrapper {
             background: linear-gradient(135deg, #FFD4DC, var(--light-red));
         }
-
         .card-icon {
             font-size: 26px;
         }
-
         .card-label {
             font-size: 20px;
             font-weight: 700;
@@ -235,14 +207,12 @@ HTML_TEMPLATE = '''
             margin-bottom: 6px;
             letter-spacing: 0.5px;
         }
-
         .card-desc {
             font-size: 13px;
             color: var(--text-gray);
             line-height: 1.5;
             letter-spacing: 0.3px;
         }
-
         .card-arrow {
             position: absolute;
             right: 20px;
@@ -257,18 +227,15 @@ HTML_TEMPLATE = '''
             transition: all 0.3s ease;
             z-index: 1;
         }
-
         .option-card:hover .card-arrow {
             transform: translateX(4px);
             background: var(--dark-red);
         }
-
         .card-arrow svg {
             width: 16px;
             height: 16px;
             fill: white;
         }
-
         /* 弹窗/详情面板 */
         .overlay {
             position: fixed;
@@ -285,12 +252,10 @@ HTML_TEMPLATE = '''
             align-items: flex-end;
             justify-content: center;
         }
-
         .overlay.active {
             opacity: 1;
             pointer-events: auto;
         }
-
         .detail-panel {
             background: var(--white);
             width: 100%;
@@ -303,11 +268,9 @@ HTML_TEMPLATE = '''
             position: relative;
             box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.2);
         }
-
         .overlay.active .detail-panel {
             transform: translateY(0);
         }
-
         .panel-handle {
             width: 40px;
             height: 4px;
@@ -315,7 +278,6 @@ HTML_TEMPLATE = '''
             border-radius: 2px;
             margin: 12px auto 0;
         }
-
         .panel-header {
             position: sticky;
             top: 0;
@@ -328,7 +290,6 @@ HTML_TEMPLATE = '''
             z-index: 10;
             border-radius: 24px 24px 0 0;
         }
-
         .panel-title {
             font-size: 20px;
             font-weight: 700;
@@ -337,7 +298,6 @@ HTML_TEMPLATE = '''
             align-items: center;
             gap: 10px;
         }
-
         .panel-title-dot {
             width: 8px;
             height: 8px;
@@ -345,7 +305,6 @@ HTML_TEMPLATE = '''
             border-radius: 50%;
             flex-shrink: 0;
         }
-
         .panel-close {
             width: 36px;
             height: 36px;
@@ -361,32 +320,26 @@ HTML_TEMPLATE = '''
             color: #666;
             flex-shrink: 0;
         }
-
         .panel-close:active {
             background: #E8E8E8;
             transform: scale(0.93);
         }
-
         .panel-body {
             padding: 20px 24px 40px;
         }
-
-        /* 会务手册内容样式 */
+        /* 培训手册内容样式 */
         .manual-section {
             margin-bottom: 24px;
         }
-
         .manual-section:last-child {
             margin-bottom: 0;
         }
-
         .section-title-bar {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 12px;
         }
-
         .section-icon-tag {
             width: 32px;
             height: 32px;
@@ -400,14 +353,12 @@ HTML_TEMPLATE = '''
             font-weight: 700;
             flex-shrink: 0;
         }
-
         .section-title-text {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-dark);
             letter-spacing: 0.5px;
         }
-
         .info-item {
             display: flex;
             align-items: flex-start;
@@ -418,11 +369,9 @@ HTML_TEMPLATE = '''
             color: #444;
             line-height: 1.6;
         }
-
         .info-item:last-child {
             border-bottom: none;
         }
-
         .info-label-tag {
             background: var(--light-red);
             color: var(--primary-red);
@@ -434,63 +383,47 @@ HTML_TEMPLATE = '''
             flex-shrink: 0;
             margin-top: 2px;
         }
-
-        /* 研学安排 - 时间线样式 */
-        .timeline-item {
-            position: relative;
-            padding-left: 28px;
-            padding-bottom: 24px;
-            border-left: 2px solid #FFD4DC;
-            margin-left: 8px;
+        /* 表格样式 - 已优化宽度和换行 */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid #FFF0F2;
+            width: 100%; /* 容器占满弹窗宽度 */
         }
-
-        .timeline-item:last-child {
-            border-left-color: transparent;
-            padding-bottom: 0;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: -8px;
-            top: 2px;
-            width: 14px;
-            height: 14px;
-            background: var(--primary-red);
-            border-radius: 50%;
-            border: 3px solid var(--white);
-            box-shadow: 0 0 0 3px #FFD4DC;
-        }
-
-        .timeline-time {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary-red);
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-
-        .timeline-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .timeline-desc {
+        .info-table {
+            /* 核心：设置最小宽度，确保6列内容能完整一行显示 */
+            min-width: 1150px;
+            /* 宽度自动适配内容，大屏幕自动拉伸 */
+            width: auto;
+            border-collapse: collapse;
             font-size: 13px;
-            color: var(--text-gray);
-            line-height: 1.5;
         }
-
-        .timeline-location {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        .info-table th, .info-table td {
+            padding: 10px 14px; /* 加大左右内边距，内容更舒展 */
+            text-align: left;
+            border-bottom: 1px solid #FFF0F2;
+            /* 核心：强制内容不换行 */
+            white-space: nowrap;
+        }
+        .info-table th {
+            background: var(--light-red);
+            color: var(--primary-red);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .info-table tr:last-child td {
+            border-bottom: none;
+        }
+        .class-table th, .class-table td {
+            text-align: center;
             font-size: 12px;
-            color: #999;
-            margin-top: 4px;
         }
-
+        .class-table .class-header {
+            background: var(--primary-red);
+            color: white;
+        }
         /* 底部 */
         .footer {
             text-align: center;
@@ -499,7 +432,6 @@ HTML_TEMPLATE = '''
             color: #CCC;
             letter-spacing: 1px;
         }
-
         /* 点击波纹效果 */
         .ripple {
             position: absolute;
@@ -509,14 +441,12 @@ HTML_TEMPLATE = '''
             animation: ripple-anim 0.6s ease-out;
             pointer-events: none;
         }
-
         @keyframes ripple-anim {
             to {
                 transform: scale(4);
                 opacity: 0;
             }
         }
-
         /* 滚动条美化 */
         .detail-panel::-webkit-scrollbar {
             width: 4px;
@@ -528,11 +458,10 @@ HTML_TEMPLATE = '''
             background: #DDD;
             border-radius: 2px;
         }
-
         /* 响应式 */
         @media (max-width: 380px) {
             .header-title {
-                font-size: 24px;
+                font-size: 22px;
             }
             .option-card {
                 padding: 22px 18px;
@@ -552,61 +481,70 @@ HTML_TEMPLATE = '''
 <body>
     <!-- 顶部红色装饰条 -->
     <div class="top-accent"></div>
-
     <div class="page-container">
         <!-- 头部 -->
         <div class="header">
-            <div class="header-badge">CONFERENCE</div>
+            <div class="header-badge">青马工程</div>
             <h1 class="header-title">
-                西藏民族大学<span class="highlight">研究生会</span>
+                西藏民族大学<span class="highlight">2026大骨班</span>
             </h1>
-            <p class="header-subtitle">请选择您要查看的内容</p>
+            <p class="header-subtitle">大学生骨干培训班培训手册</p>
             <div class="divider-ornament">
                 <span class="line"></span>
                 <span class="dot"></span>
                 <span class="line"></span>
             </div>
         </div>
-
-        <!-- 两个选项卡片 -->
+        <!-- 三个选项卡片 -->
         <div class="cards-section">
-            <!-- 会务手册卡片 -->
+            <!-- 培训手册卡片 -->
             <div class="option-card" id="cardManual" onclick="openDetail('manual')">
                 <div class="card-decoration"></div>
                 <div class="card-content">
                     <div class="card-icon-wrapper">
                         <span class="card-icon">📋</span>
                     </div>
-                    <div class="card-label">会务手册</div>
-                    <div class="card-desc">查看会议日程、场地信息、参会须知等详细信息</div>
+                    <div class="card-label">培训手册</div>
+                    <div class="card-desc">查看培训方案、培养目标、要求及考勤制度</div>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
                 </div>
             </div>
-
-            <!-- 研学安排卡片 -->
-            <div class="option-card" id="cardStudy" onclick="openDetail('study')">
+            <!-- 课程表卡片 -->
+            <div class="option-card" id="cardSchedule" onclick="openDetail('schedule')">
                 <div class="card-decoration"></div>
                 <div class="card-content">
                     <div class="card-icon-wrapper">
-                        <span class="card-icon">🎓</span>
+                        <span class="card-icon">📅</span>
                     </div>
-                    <div class="card-label">研学安排</div>
-                    <div class="card-desc">查看研学行程、活动内容、时间安排等详细计划</div>
+                    <div class="card-label">课程表</div>
+                    <div class="card-desc">查看完整培训课程安排、时间及地点</div>
+                </div>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+                </div>
+            </div>
+            <!-- 分班表卡片 -->
+            <div class="option-card" id="cardClass" onclick="openDetail('class')">
+                <div class="card-decoration"></div>
+                <div class="card-content">
+                    <div class="card-icon-wrapper">
+                        <span class="card-icon">👥</span>
+                    </div>
+                    <div class="card-label">分班表</div>
+                    <div class="card-desc">查看各班班长、副班长及成员名单</div>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
                 </div>
             </div>
         </div>
-
         <!-- 底部 -->
         <div class="footer">
-            <p>如有疑问请联系会务组</p>
+            <p>共青团西藏民族大学委员会 2026年5月</p>
         </div>
     </div>
-
     <!-- 详情弹窗 -->
     <div class="overlay" id="overlay" onclick="closeDetail(event)">
         <div class="detail-panel" id="detailPanel" onclick="event.stopPropagation()">
@@ -614,7 +552,7 @@ HTML_TEMPLATE = '''
             <div class="panel-header">
                 <div class="panel-title">
                     <span class="panel-title-dot"></span>
-                    <span id="panelTitle">会务手册</span>
+                    <span id="panelTitle">培训手册</span>
                 </div>
                 <button class="panel-close" onclick="closeDetailDirect()">✕</button>
             </div>
@@ -623,109 +561,142 @@ HTML_TEMPLATE = '''
             </div>
         </div>
     </div>
-
     <script>
-        // 会务手册数据
+        // 培训手册数据
         const manualData = {
-            title: '会务手册',
+            title: '培训手册',
             sections: [
                 {
-                    icon: '📅',
-                    title: '会议日程',
-                    items: [
-                        { label: '日期', value: '2026年5月15日 - 5月17日' },
-                        { label: '报到时间', value: '5月15日 09:00 - 18:00' },
-                        { label: '开幕式', value: '5月16日 09:00 - 10:30' },
-                        { label: '主题报告', value: '5月16日 10:45 - 17:00' },
-                        { label: '闭幕总结', value: '5月17日 14:00 - 16:00' },
-                    ]
-                },
-                {
                     icon: '📍',
-                    title: '场地信息',
+                    title: '基本信息',
                     items: [
-                        { label: '主会场', value: '国际会议中心 · 三层大宴会厅' },
-                        { label: '分会场A', value: '国际会议中心 · 二层201会议室' },
-                        { label: '分会场B', value: '国际会议中心 · 二层202会议室' },
-                        { label: '用餐地点', value: '国际会议中心 · 一层自助餐厅' },
+                        { label: '开班时间', value: '2026年5月9日' },
+                        { label: '开班地点', value: '秦汉校区学术报告厅' },
+                        { label: '培训时间', value: '5月9日、16日、17日、23日、30日、6月6日' },
+                        { label: '培训形式', value: '知识培训+实践基地研学' },
+                        { label: '学员人数', value: '共计87名' },
                     ]
                 },
                 {
-                    icon: '📝',
-                    title: '参会须知',
+                    icon: '👤',
+                    title: '学员组成',
                     items: [
-                        { label: '签到', value: '请携带身份证件及参会凭证签到入场' },
-                        { label: '着装', value: '建议商务休闲着装，开幕式请着正装' },
-                        { label: '网络', value: '会场提供免费Wi-Fi，账号及密码见胸牌' },
-                        { label: '停车', value: '凭参会证可免费停车于B2层嘉宾停车区' },
+                        { label: '校团委', value: '专兼职团干部' },
+                        { label: '校级组织', value: '校学生会、研究生会、青年志愿者协会部长及以上学生干部' },
+                        { label: '学院', value: '各学院学生分会、研究生分会主席各1名' },
+                        { label: '社团', value: '部分校级社团社长1名' },
                     ]
                 },
                 {
-                    icon: '📞',
-                    title: '联系方式',
+                    icon: '🎯',
+                    title: '培养目标',
                     items: [
-                        { label: '会务组', value: '138-0000-1234 / conf@example.com' },
-                        { label: '酒店前台', value: '010-8888-6666（24小时）' },
-                        { label: '紧急联络', value: '139-0000-5678（王秘书）' },
+                        { label: '政治品格', value: '信念坚定，拥护党的领导' },
+                        { label: '家国情怀', value: '扎根西藏，服务边疆建设' },
+                        { label: '理论素养', value: '掌握马克思主义中国化最新成果' },
+                        { label: '综合能力', value: '具备组织协调、服务基层的实践本领' },
+                    ]
+                },
+                {
+                    icon: '📚',
+                    title: '培训内容',
+                    items: [
+                        { label: '理论学习', value: '时政政策解读、藏传佛教实践、党的青年工作' },
+                        { label: '能力培养', value: '公文写作、社区服务策划、田野调查' },
+                        { label: '专题研学', value: '延安革命纪念馆、杨家岭、枣园、梁家河村史馆' },
+                    ]
+                },
+                {
+                    icon: '⚠️',
+                    title: '培训要求',
+                    items: [
+                        { label: '组织要求', value: '各单位做好学员遴选和监督工作' },
+                        { label: '学员要求', value: '不迟到早退，不无故请假缺席' },
+                        { label: '考核要求', value: '学习实效作为评优奖励重要依据' },
+                    ]
+                },
+                {
+                    icon: '✅',
+                    title: '考勤制度',
+                    items: [
+                        { label: '签到', value: '提前15分钟签到，本人亲自签到，禁止代签' },
+                        { label: '请假', value: '事假需学院团委公章，病假需医院证明' },
+                        { label: '纪律', value: '关闭通讯设备，保持会场秩序' },
+                        { label: '结业', value: '缺课两节以上不予结业，取消年度青马资格' },
                     ]
                 },
             ]
         };
-
-        // 研学安排数据
-        const studyData = {
-            title: '研学安排',
-            timeline: [
-                {
-                    time: '5月15日 · 下午',
-                    title: '抵达与入住',
-                    desc: '抵达会议酒店，办理入住手续，领取研学资料包及分组手环。',
-                    location: '国际会议中心 · 大堂'
-                },
-                {
-                    time: '5月16日 · 上午',
-                    title: '开幕式 & 主旨演讲',
-                    desc: '参加大会开幕式，聆听行业专家主旨演讲，了解最新发展趋势与前沿动态。',
-                    location: '三层大宴会厅'
-                },
-                {
-                    time: '5月16日 · 下午',
-                    title: '分组研讨 WorkShop',
-                    desc: '按研究方向分组进行深度研讨，每组配备导师引导，产出研讨纪要。',
-                    location: '二层会议室'
-                },
-                {
-                    time: '5月17日 · 上午',
-                    title: '实地考察参访',
-                    desc: '前往本地标杆企业/机构进行实地考察，与一线从业者交流实践经验。',
-                    location: '统一乘车前往（详见分组通知）'
-                },
-                {
-                    time: '5月17日 · 下午',
-                    title: '成果汇报 & 闭幕',
-                    desc: '各组汇报研学成果，颁发研学证书，合影留念，会议闭幕。',
-                    location: '三层大宴会厅'
-                },
+        // 课程表数据
+        const scheduleData = {
+            title: '课程表',
+            headers: ['日期', '上课时间', '课程内容', '主讲人', '主持人', '地点'],
+            rows: [
+                ['5.9', '16:30-18:00', '党委书记开班讲课', '采守宽（学校党委书记）', '索朗玉珍', '学术报告厅（渭城校区）'],
+                ['5.9', '18:30-19:30', '团队破冰', '——', '闹布', '运动场（渭城校区）'],
+                ['5.16', '19:30-20:30', '专项研学理论研讨', '——', '德吉措姆', '研学驻地'],
+                ['5.23', '8:30-10:00', '铸牢中华民族共同体意识', '达宝次仁（西藏党委党校）', '德吉措姆', '学术报告厅（秦汉校区）'],
+                ['5.23', '10:20-11:50', '依法治理藏传佛教的实践与启示', '达宝次仁（西藏党委党校）', '德吉措姆', '学术报告厅（秦汉校区）'],
+                ['5.23', '14:50-16:20', '笔杆子与会务通：学生干部办文办会实战指南', '——', '高果露', '学术报告厅（秦汉校区）'],
+                ['5.23', '16:40-18:10', '大学生廉洁教育', '——', '闹布', '学术报告厅（秦汉校区）'],
+                ['5.30', '8:30-10:00', '青年学生干部综合素养提升与发展规划', '——', '胡小亮', '学术报告厅（秦汉校区）'],
+                ['5.30', '10:20-11:50', '从百年党史和团史中汲取奋进新时代的强大力量', '李晓燕（陕西省委党校）', '罗爽', '学术报告厅（秦汉校区）'],
+                ['5.30', '14:30-16:00', '共青团社区青少年服务策划与实施', '王渭巍（中央团校）', '胡小亮', '学术报告厅（秦汉校区）'],
+                ['5.30', '16:20-17:50', '人工智能与网络安全', '——', '高果露', '学术报告厅（秦汉校区）'],
+                ['5.30', '18:30-19:30', '理论学习研讨', '——', '德吉措姆', '学术报告厅（秦汉校区）'],
+                ['6.6', '8:30-10:00', '青年骨干社会调研与田野实践', '——', '罗爽', '学术报告厅（秦汉校区）'],
+                ['6.6', '10:10-12:00', '安全（消防）体验教育课程', '保卫部', '闹布', '学术报告厅（秦汉校区）'],
+                ['6.6', '15:00-17:00', '优秀校友返校座谈交流', '——', '胡小亮', '学术报告厅（秦汉校区）'],
+                ['6.6', '17:20-18:20', '桌面推演', '——', '罗爽', '秦汉校区教室'],
             ]
         };
-
+        // 分班表数据
+        const classData = {
+            title: '分班表',
+            classes: [
+                {
+                    name: '一班',
+                    monitor: '德吉措姆',
+                    viceMonitor: '刘倩',
+                    members: ['曹宇彤', '李芬芬', '张瀚予', '刘佳烨', '周梦雨', '益西尼玛', '刘佳雨', '珠吉江措', '李泓成', '何沁薇', '佘诗琦', '时馨怡', '白玛旺姆', '解树群', '次仁央吉', '扎西次吉', '余瑞东', '戴槟']
+                },
+                {
+                    name: '二班',
+                    monitor: '高果露',
+                    viceMonitor: '胡小亮',
+                    members: ['李佳璇', '申畑恬', '高梓亮', '张宇航', '张海明', '郝晓华', '谭雨晨', '庞星源', '土登美久', '龙娟', '周悦颖', '谢恬', '吕豪雨', '洛松次仁', '格桑扎西', '陈贝妮', '次旺白玛', '扎西伦珠', '康嘎措姆']
+                },
+                {
+                    name: '三班',
+                    monitor: '闹布',
+                    viceMonitor: '罗爽',
+                    members: ['达娃', '肖雅倩', '王佳卉', '常江', '王俊谚', '张雪松', '李子昂', '许妍蓓', '赵晶', '郭小凯', '谢雅欣', '李露', '朱敏', '格桑玉珍', '郭江波', '高奕博', '逯如意', '尼玛仓木拉', '杨佳晔']
+                },
+                {
+                    name: '四班（秦汉校区）',
+                    monitor: '强巴扎西',
+                    viceMonitor: '白玛群措',
+                    members: ['平措南加', '巴桑仓决', '王恩宁', '白玛央珍', '旦增索朗', '李烁', '肖楼', '多吉占堆', '齐天宇', '周文杰', '次旺欧珠', '黄宏方', '王渤涵', '赵艺航', '赤列罗布', '王雅菲', '曹卓颖', '刘馨蓓', '席仲远', '王思晨', '旦增次央', '丹智白萨', '戴同欣']
+                }
+            ]
+        };
         function openDetail(type) {
             const overlay = document.getElementById('overlay');
             const panelTitle = document.getElementById('panelTitle');
             const panelBody = document.getElementById('panelBody');
-
             if (type === 'manual') {
                 panelTitle.textContent = manualData.title;
                 panelBody.innerHTML = renderManualContent();
-            } else if (type === 'study') {
-                panelTitle.textContent = studyData.title;
-                panelBody.innerHTML = renderStudyContent();
+            } else if (type === 'schedule') {
+                panelTitle.textContent = scheduleData.title;
+                panelBody.innerHTML = renderScheduleContent();
+            } else if (type === 'class') {
+                panelTitle.textContent = classData.title;
+                panelBody.innerHTML = renderClassContent();
             }
-
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-
         function renderManualContent() {
             let html = '';
             manualData.sections.forEach(section => {
@@ -748,37 +719,58 @@ HTML_TEMPLATE = '''
             });
             return html;
         }
-
-        function renderStudyContent() {
+        function renderScheduleContent() {
+            let html = '<div class="table-container"><table class="info-table"><thead><tr>';
+            scheduleData.headers.forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            scheduleData.rows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+        function renderClassContent() {
             let html = '';
-            studyData.timeline.forEach((item, index) => {
+            classData.classes.forEach(cls => {
                 html += `
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-time">${item.time}</div>
-                        <div class="timeline-title">${item.title}</div>
-                        <div class="timeline-desc">${item.desc}</div>
-                        <div class="timeline-location">
-                            <span>📍</span> ${item.location}
+                    <div class="manual-section">
+                        <div class="section-title-bar">
+                            <div class="section-icon-tag">👥</div>
+                            <div class="section-title-text">${cls.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label-tag">班长</span>
+                            <span>${cls.monitor}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label-tag">副班长</span>
+                            <span>${cls.viceMonitor}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label-tag">成员</span>
+                            <span>${cls.members.join('、')}</span>
                         </div>
                     </div>
                 `;
             });
             return html;
         }
-
         function closeDetail(e) {
             if (e.target === document.getElementById('overlay')) {
                 closeDetailDirect();
             }
         }
-
         function closeDetailDirect() {
             const overlay = document.getElementById('overlay');
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-
         // 点击卡片波纹效果
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function(e) {
@@ -793,8 +785,7 @@ HTML_TEMPLATE = '''
                 ripple.addEventListener('animationend', () => ripple.remove());
             });
         });
-
-        // 触摸滑动关闭弹窗（简单实现）
+        // 触摸滑动关闭弹窗
         let touchStartY = 0;
         const detailPanel = document.getElementById('detailPanel');
         detailPanel.addEventListener('touchstart', function(e) {
@@ -811,67 +802,44 @@ HTML_TEMPLATE = '''
 </body>
 </html>
 '''
-
-
 @app.route('/')
 def index():
     """主页面"""
     return render_template_string(HTML_TEMPLATE)
-
-
 @app.route('/api/manual')
 def api_manual():
-    """会务手册API（可选）"""
+    """培训手册API"""
     data = {
-        'title': '会务手册',
+        'title': '培训手册',
         'sections': [
             {
-                'icon': '📅',
-                'title': '会议日程',
-                'items': [
-                    {'label': '日期', 'value': '2026年5月15日 - 5月17日'},
-                    {'label': '报到时间', 'value': '5月15日 09:00 - 18:00'},
-                    {'label': '开幕式', 'value': '5月16日 09:00 - 10:30'},
-                    {'label': '主题报告', 'value': '5月16日 10:45 - 17:00'},
-                    {'label': '闭幕总结', 'value': '5月17日 14:00 - 16:00'},
-                ]
-            },
-            {
                 'icon': '📍',
-                'title': '场地信息',
+                'title': '基本信息',
                 'items': [
-                    {'label': '主会场', 'value': '国际会议中心 · 三层大宴会厅'},
-                    {'label': '分会场A', 'value': '国际会议中心 · 二层201会议室'},
-                    {'label': '分会场B', 'value': '国际会议中心 · 二层202会议室'},
-                    {'label': '用餐地点', 'value': '国际会议中心 · 一层自助餐厅'},
+                    {'label': '开班时间', 'value': '2026年5月9日'},
+                    {'label': '开班地点', 'value': '秦汉校区学术报告厅'},
+                    {'label': '培训时间', 'value': '5月9日、5月16日、5月17日、5月23日、5月30日、6月6日'},
                 ]
             }
         ]
     }
     return jsonify(data)
-
-
-@app.route('/api/study')
-def api_study():
-    """研学安排API（可选）"""
+@app.route('/api/schedule')
+def api_schedule():
+    """课程表API"""
     data = {
-        'title': '研学安排',
-        'timeline': [
-            {'time': '5月15日 下午', 'title': '抵达与入住', 'desc': '抵达酒店，办理入住，领取资料包'},
-            {'time': '5月16日 上午', 'title': '开幕式', 'desc': '参加开幕式及主旨演讲'},
-            {'time': '5月16日 下午', 'title': '分组研讨', 'desc': '分组深度研讨与交流'},
-            {'time': '5月17日 上午', 'title': '实地考察', 'desc': '标杆企业/机构参访'},
-            {'time': '5月17日 下午', 'title': '成果汇报', 'desc': '汇报成果，颁发证书'},
+        'title': '课程表',
+        'headers': ['日期', '上课时间', '课程内容', '主讲人', '主持人', '地点'],
+        'rows': [
+            {'date': '5.9', 'time': '16:30-18:00', 'content': '党委书记开班讲课', 'speaker': '采守宽', 'host': '索朗玉珍', 'location': '渭城校区学术报告厅'}
         ]
     }
     return jsonify(data)
-
-
 if __name__ == '__main__':
     # 获取端口，默认使用5000
     port = int(os.environ.get('PORT', 5000))
     print('=' * 50)
-    print('  🎉  会议信息H5页面已启动')
+    print('  🎉  西藏民族大学2026大骨班培训手册已启动')
     print(f'  📱  请在浏览器中打开: http://127.0.0.1:{port}')
     print(f'  🌐  局域网访问: http://0.0.0.0:{port}')
     print('  📋  按 Ctrl+C 停止服务')
