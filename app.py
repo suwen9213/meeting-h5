@@ -480,7 +480,7 @@ HTML_TEMPLATE = '''
                         <span class="card-icon">📋</span>
                     </div>
                     <div class="card-label">培训手册</div>
-                    <div class="card-desc">查看培训方案、培养目标、要求及考勤制度</div>
+                    <div class="card-desc">查看培养目标、培训内容、培训要求及考勤制度</div>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
