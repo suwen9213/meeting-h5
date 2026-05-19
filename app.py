@@ -480,7 +480,7 @@ HTML_TEMPLATE = '''
                         <span class="card-icon">📋</span>
                     </div>
                     <div class="card-label">培训手册</div>
-                    <div class="card-desc">查看培养目标、培训内容、培训要求及考勤制度</div>
+                    <div class="card-desc">查看培训方案、培养目标、要求及考勤制度</div>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
@@ -539,11 +539,10 @@ HTML_TEMPLATE = '''
                     icon: '📍',
                     title: '基本信息',
                     items: [
-                        { label: '开班时间', value: '2026年5月9日' },
-                        { label: '开班地点', value: '秦汉校区学术报告厅' },
-                        { label: '培训时间', value: '5月9日、16日、17日、23日、30日、6月6日' },
+                        { label: '开班时间', value: '2026年5月23日' },
+                        { label: '培训时间', value: '5月底到6月中旬' },
                         { label: '培训形式', value: '知识培训+实践基地研学' },
-                        { label: '学员人数', value: '共计87名' },
+                        { label: '学员人数', value: '共计90名' },
                     ]
                 },
                 {
@@ -786,9 +785,9 @@ def api_manual():
                 'icon': '📍',
                 'title': '基本信息',
                 'items': [
-                    {'label': '开班时间', 'value': '2026年5月9日'},
-                    {'label': '开班地点', 'value': '秦汉校区学术报告厅'},
-                    {'label': '培训时间', 'value': '5月9日、5月16日、5月17日、5月23日、5月30日、6月6日'},
+                    {'label': '开班时间', 'value': '2026年5月23日'},
+                    {'label': '培训时间', 'value': '5月底到6月中旬'},
+                    {'label': '培训形式', 'value': '知识培训+实践基地研学'},
                 ]
             }
         ]
